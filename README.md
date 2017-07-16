@@ -1,2 +1,2 @@
-# InterpolationFourrierDomain
-This project implements Fourrier Domain Interpolation in Fortran and Python
+# InterpolationFourierDomain
+This project implements Fourier Domain Interpolation in Fortran and Python
