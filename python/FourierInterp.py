@@ -18,14 +18,15 @@ def main():
     import matplotlib.pyplot as plt
     import scipy.fftpack 
      
-    incr_sampling = 2
+    incr_sampling = 1
     L  = 2.0
     dt = 0.001
     Nt = L/dt + 1
     
      
     t = np.linspace(0.0,dt*Nt,Nt)
-    y = np.exp(-100*(t-0.3)*(t-0.3))
+    #y = np.exp(-100*(t-0.3)*(t-0.3))
+    y = np.sin(2*np.pi*50*t)
      
     plt.figure(1)
     plt.plot(t,y,color='k',linestyle='dashed',marker='o')

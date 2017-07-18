@@ -48,7 +48,7 @@ PROGRAM FourierInterpolation
   ! calculation
   !  y = exp(-1000*(t-0.3)*(t-0.3))
   frequency = 10 !Hz
-  y = sin(2*pi*frequency*t)
+  y = sin(2*pi*frequency*t)  +sin(2*pi*2*t)
 
 
   ! save function
@@ -62,28 +62,24 @@ PROGRAM FourierInterpolation
   !prepare fft
   CALL dfftw_plan_dft_r2c_1d_ (plan_forward,Nt,y,out,FFTW_ESTIMATE)
   
-  !execute
+  !execute fft
   CALL dfftw_execute_ (plan_forward)
-  
-  print*, size(out)
+
+  ! estimating frequencies
   f0 = 0.0
-  tf =2.0/(2*dt) 
-  df = (tf - f0)/(Nt_c-1)
-  
+  ff =1.0/(4*dt) 
+  df = (ff - f0)/(Nt_c-1)
   f  = (/(f0 + (k-1)*df ,k=1,Nt_c,1)/)
+  f  = Fs/2*f
+ 
+  ! save fourier transform of function
   open(26,file='gaussfunction_fourierdomain.dat',status='unknown',form='formatted')
-
-  ! do k=1,Nt_c
-  !    write(26,*) f(k),2.0/Nt*abs(out(k))
-  ! end do
-
-
   do k=1,Nt
-     write(26,*) k,abs(out(k))
+     write(26,*) f(k),abs(out(k)/tf)
   end do
-
   close(26)
 
+  !end fft
   call dfftw_destroy_plan_ ( plan_forward )
 
 END PROGRAM FourierInterpolation
