@@ -6,7 +6,7 @@ PROGRAM FourierInterpolation
 
   INTEGER    ,PARAMETER                :: sp=4, dp=8, qp=16
   INTEGER(sp),PARAMETER                :: seed = 8198272  
-  INTEGER                              :: k,Nt,Nt_c
+  INTEGER                              :: k,Nt,factor
   REAL(dp)  ,PARAMETER                 :: pi = 4.0*atan(1.0)
   REAL(dp)                             :: dt,dt_interp,t0,tf
   REAL(dp)                             :: df,f0,ff,Fs
@@ -21,18 +21,20 @@ PROGRAM FourierInterpolation
   call srand(seed)
   
   ! Parameters
+  
   t0 = 0.0
   tf = 1.0
-  Nt = 1001
-  Nt_c = Nt/2 + 1
+  Nt = 1024
+  factor = 5
+
 
   ! Alocating
   ALLOCATE(out(Nt))
-  ALLOCATE(out_expanded(2*Nt))
+  ALLOCATE(out_expanded(factor*Nt))
   ALLOCATE(t(Nt))
-  ALLOCATE(t_interp(2*Nt))
+  ALLOCATE(t_interp(factor*Nt))
   ALLOCATE(y(Nt))
-  ALLOCATE(y_interp(2*Nt))
+  ALLOCATE(y_interp(factor*Nt))
   ALLOCATE(f(Nt))
   
   out_expanded = 0.0
@@ -84,22 +86,21 @@ PROGRAM FourierInterpolation
   close(26)
 
   ! prepare inverse fft
-  CALL dfftw_plan_dft_c2r_1d_(plan_backward,2*Nt,out_expanded,y_interp,FFTW_ESTIMATE)
+  CALL dfftw_plan_dft_c2r_1d_(plan_backward,factor*Nt,out_expanded,y_interp,FFTW_ESTIMATE)
 
   ! execute inverse fft
   CALL dfftw_execute(plan_backward)
 
   !New Sampling
-  dt_interp = (tf - t0)/(2*Nt-1)
+  dt_interp = dt/factor
+!  dt_interp = (tf - t0)/(2*Nt-1)
   !New vector
-  t_interp = (/(t0 + (k-1)*dt_interp,k=1,2*Nt,1)/)
-
+  t_interp = (/(t0 + (k-1)*dt_interp,k=1,factor*Nt,1)/)
 
   ! save interpolated function
   open(27,file='gaussfunction_interpolated.dat',status='unknown',form='formatted')
-  do k=1,2*Nt     
-     !     y(k) = rand()
-     write(27,*) t_interp(k),y_interp(k)
+  do k=1,factor*Nt     
+     write(27,*) t_interp(k),y_interp(k)/Nt
   end do
   close(25)
 
