@@ -1,5 +1,5 @@
 PROGRAM FourierInterpolation
-
+!Compile - $ gfortran FourierInterp.f90 -Ldirectory -lfftw3 -o run_Fourier
   IMPLICIT NONE
 
   INCLUDE "fftw3.f90"
@@ -23,7 +23,7 @@ PROGRAM FourierInterpolation
   ! Parameters
   t0 = 0.0
   tf = 1.0
-  Nt = 100
+  Nt = 1001
   Nt_c = Nt/2 + 1
 
   ! Alocating
@@ -31,7 +31,7 @@ PROGRAM FourierInterpolation
   ALLOCATE(out(Nt))
   ALLOCATE(t(Nt))
   ALLOCATE(y(Nt))
-  ALLOCATE(f(Nt_c))
+  ALLOCATE(f(Nt))
 
   !Sampling
   dt = (tf - t0)/(Nt-1)
@@ -39,7 +39,7 @@ PROGRAM FourierInterpolation
   Fs = 1/dt
   print*,''
   print*,'Sample rate = ',dt, 'Frequency sampling = ', Fs
-  print*,'Nyquist Frequency = ', Fs/4
+  print*,'Nyquist Frequency = ', Fs/2
   print*,''
 
   ! vector
@@ -48,7 +48,7 @@ PROGRAM FourierInterpolation
   ! calculation
   !  y = exp(-1000*(t-0.3)*(t-0.3))
   frequency = 10 !Hz
-  y = sin(2*pi*frequency*t)  +sin(2*pi*2*t)
+  y = sin(2*pi*frequency*t)  +sin(2*pi*2*t) + sin(2*pi*20*t)
 
 
   ! save function
@@ -65,17 +65,17 @@ PROGRAM FourierInterpolation
   !execute fft
   CALL dfftw_execute_ (plan_forward)
 
+
   ! estimating frequencies
   f0 = 0.0
-  ff =1.0/(4*dt) 
-  df = (ff - f0)/(Nt_c-1)
-  f  = (/(f0 + (k-1)*df ,k=1,Nt_c,1)/)
-  f  = Fs/2*f
+  df = Fs/size(y)
+  f  = (/(f0 + (k-1)*df ,k=1,Nt)/)
  
   ! save fourier transform of function
   open(26,file='gaussfunction_fourierdomain.dat',status='unknown',form='formatted')
   do k=1,Nt
-     write(26,*) f(k),abs(out(k)/tf)
+     print*,'k,f(k)=>',k,f(k),abs(out(k)/Nt)
+     write(26,*) f(k),abs(out(k)/Nt)
   end do
   close(26)
 
