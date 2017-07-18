@@ -17,6 +17,8 @@ def main():
 
     plot_from_file('gaussfunction_fourierdomain.dat')
 
+    plot_from_file('gaussfunction_interpolated.dat')
+
 def plot_from_file(filename):
     import numpy as np
     import matplotlib.pyplot as plt

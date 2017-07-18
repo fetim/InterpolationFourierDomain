@@ -8,14 +8,14 @@ PROGRAM FourierInterpolation
   INTEGER(sp),PARAMETER                :: seed = 8198272  
   INTEGER                              :: k,Nt,Nt_c
   REAL(dp)  ,PARAMETER                 :: pi = 4.0*atan(1.0)
-  REAL(dp)                             :: dt,t0,tf
+  REAL(dp)                             :: dt,dt_interp,t0,tf
   REAL(dp)                             :: df,f0,ff,Fs
   REAL(dp)                             :: frequency
   REAL(dp)                             :: plan_backward,plan_forward
   
-  REAL(dp)   ,DIMENSION(:),ALLOCATABLE    :: in
-  REAL(dp)   ,DIMENSION(:),ALLOCATABLE    :: t,y,f
-  COMPLEX(dp),DIMENSION(:),ALLOCATABLE :: out 
+
+  REAL(dp)   ,DIMENSION(:),ALLOCATABLE    :: t,t_interp,y,y_interp,f
+  COMPLEX(dp),DIMENSION(:),ALLOCATABLE :: out,out_expanded
 
   ! seed random number mechanism
   call srand(seed)
@@ -27,11 +27,15 @@ PROGRAM FourierInterpolation
   Nt_c = Nt/2 + 1
 
   ! Alocating
-  ALLOCATE(in(Nt))
   ALLOCATE(out(Nt))
+  ALLOCATE(out_expanded(2*Nt))
   ALLOCATE(t(Nt))
+  ALLOCATE(t_interp(2*Nt))
   ALLOCATE(y(Nt))
+  ALLOCATE(y_interp(2*Nt))
   ALLOCATE(f(Nt))
+  
+  out_expanded = 0.0
 
   !Sampling
   dt = (tf - t0)/(Nt-1)
@@ -74,12 +78,35 @@ PROGRAM FourierInterpolation
   ! save fourier transform of function
   open(26,file='gaussfunction_fourierdomain.dat',status='unknown',form='formatted')
   do k=1,Nt
-     print*,'k,f(k)=>',k,f(k),abs(out(k)/Nt)
+     out_expanded(k) = out(k)
      write(26,*) f(k),abs(out(k)/Nt)
   end do
   close(26)
 
+  ! prepare inverse fft
+  CALL dfftw_plan_dft_c2r_1d_(plan_backward,2*Nt,out_expanded,y_interp,FFTW_ESTIMATE)
+
+  ! execute inverse fft
+  CALL dfftw_execute(plan_backward)
+
+  !New Sampling
+  dt_interp = (tf - t0)/(2*Nt-1)
+  !New vector
+  t_interp = (/(t0 + (k-1)*dt_interp,k=1,2*Nt,1)/)
+
+
+  ! save interpolated function
+  open(27,file='gaussfunction_interpolated.dat',status='unknown',form='formatted')
+  do k=1,2*Nt     
+     !     y(k) = rand()
+     write(27,*) t_interp(k),y_interp(k)
+  end do
+  close(25)
+
   !end fft
-  call dfftw_destroy_plan_ ( plan_forward )
+  CALL dfftw_destroy_plan_ ( plan_forward )
+  CALL dfftw_destroy_plan_ ( plan_backward )
+
+
 
 END PROGRAM FourierInterpolation
