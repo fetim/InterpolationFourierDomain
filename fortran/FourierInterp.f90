@@ -24,8 +24,8 @@ PROGRAM FourierInterpolation
   
   t0 = 0.0
   tf = 1.0
-  Nt = 1024
-  factor = 5
+  Nt = 100
+  factor = 100
 
 
   ! Alocating
@@ -45,7 +45,7 @@ PROGRAM FourierInterpolation
   Fs = 1/dt
   print*,''
   print*,'Sample rate = ',dt, 'Frequency sampling = ', Fs
-  print*,'Nyquist Frequency = ', Fs/2
+  print*,'Nyquist Frequency = ', Fs/4
   print*,''
 
   ! vector
@@ -54,7 +54,7 @@ PROGRAM FourierInterpolation
   ! calculation
   !  y = exp(-1000*(t-0.3)*(t-0.3))
   frequency = 10 !Hz
-  y = sin(2*pi*frequency*t)  +sin(2*pi*2*t) + sin(2*pi*20*t)
+  y = 0.1*sin(2*pi*frequency*t)  + sin(2*pi*2*t) + sin(2*pi*20*t)
 
 
   ! save function

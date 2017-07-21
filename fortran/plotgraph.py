@@ -13,11 +13,15 @@ Plot a Graph from a ascii file with two columns.
 
 def main():
     
-    plot_from_file('gaussfunction.dat')
+#    plot_from_file('gaussfunction.dat')
 
-    plot_from_file('gaussfunction_fourierdomain.dat')
+#    plot_from_file('gaussfunction_fourierdomain.dat')
 
-    plot_from_2files('gaussfunction.dat','gaussfunction_interpolated.dat')
+     #plot_from_file('Seismogram_trace.dat')
+#     plot_from_file('Seismogram_trace_Fourier.dat')
+
+#    plot_from_2files('gaussfunction.dat','gaussfunction_interpolated.dat')
+     plot_from_2files('Seismogram_trace.dat','Seismogram_trace_Interp.dat')	
 
 def plot_from_file(filename):
     import numpy as np
@@ -38,14 +42,16 @@ def plot_from_2files(filename1,filename2):
    
     plt.figure(1)    
     data = np.loadtxt(filename1,float)    
-    x = data[:,0]
-    y = data[:,1]
-    plt.plot(x,y,color='k',linestyle='dashed',marker='o',markersize=10)
+    x = data[:]
+    #x = data[:,0]
+    #y = data[:,1]
+    plt.plot(x,color='k',linestyle='dashed',marker='o',markersize=10)
 
     data = np.loadtxt(filename2,float)    
-    x = data[:,0]
-    y = data[:,1]
-    plt.plot(x,y,color='r',marker='o')
+    x = data[:]
+    #x = data[:,0]
+    #y = data[:,1]
+    plt.plot(x,color='r',marker='o')
     plt.show()
 
 
