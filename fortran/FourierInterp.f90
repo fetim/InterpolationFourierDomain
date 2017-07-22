@@ -1,5 +1,36 @@
 PROGRAM FourierInterpolation
-!Compile - $ gfortran FourierInterp.f90 -Ldirectory -lfftw3 -o run_Fourier
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ! ### Compiling ### - $ gfortran FourierInterp.f90 -Ldirectory -lfftw3 -o run_Fourier
+    !  ### Execute ###  - $ ./run_Fourier
+    !
+    ! FourierInterp.f90 - Fourier Interpolation /  Zero Padding in the Fourier Domain.
+    !   This program interpolates a function y(t).
+    !   The function y(t) is defined inside the program.
+    !   
+    ! INPUT:  
+    !       t0 = initial t  
+    !       tf = final t
+    !       Nt = number of sample
+    !       factor = interpolation factor
+    !       t0 = initial t
+    !       frequency1 = 10 Hz
+    !       frequency2 = 20 Hz
+    !       frequency3 =  2 Hz
+    !       y(t) = 0.1*sin(2*pi*frequency1*t)  + sin(2*pi*frequency2*t) + sin(2*pi*frequency3*t)
+    !
+    ! OUTPUT: 
+    !       function.dat - t,y(t)
+    !       function_fourierdomain.dat - f,Y(f)
+    !       function_interpolated.dat - t,y_interp(t)
+    ! 
+    ! Code Written by Felipe Timoteo
+    !                 email : felipetimoteo@id.uff.br
+    !                 Last update: July 22th, 2017
+    !
+    ! Copyright (C) 2017 Grupo de Imageamento Sísmico e Inversão Sísmica (GISIS)
+    !                    Departamento de Geologia e Geofísica
+    !                    Universidade Federal Fluminense
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   IMPLICIT NONE
 
   INCLUDE "fftw3.f90"
@@ -17,11 +48,8 @@ PROGRAM FourierInterpolation
   REAL(dp)   ,DIMENSION(:),ALLOCATABLE    :: t,t_interp,y,y_interp,f
   COMPLEX(dp),DIMENSION(:),ALLOCATABLE :: out,out_expanded
 
-  ! seed random number mechanism
-  call srand(seed)
   
-  ! Parameters
-  
+  ! Parameters  
   t0 = 0.0
   tf = 1.0
   Nt = 100
@@ -58,7 +86,7 @@ PROGRAM FourierInterpolation
 
 
   ! save function
-  open(25,file='gaussfunction.dat',status='unknown',form='formatted')
+  open(25,file='function.dat',status='unknown',form='formatted')
   do k=1,Nt     
      !     y(k) = rand()
      write(25,*) t(k),y(k)
@@ -78,7 +106,7 @@ PROGRAM FourierInterpolation
   f  = (/(f0 + (k-1)*df ,k=1,Nt)/)
  
   ! save fourier transform of function
-  open(26,file='gaussfunction_fourierdomain.dat',status='unknown',form='formatted')
+  open(26,file='function_fourierdomain.dat',status='unknown',form='formatted')
   do k=1,Nt
      out_expanded(k) = out(k)
      write(26,*) f(k),abs(out(k)/Nt)
@@ -98,7 +126,7 @@ PROGRAM FourierInterpolation
   t_interp = (/(t0 + (k-1)*dt_interp,k=1,factor*Nt,1)/)
 
   ! save interpolated function
-  open(27,file='gaussfunction_interpolated.dat',status='unknown',form='formatted')
+  open(27,file='function_interpolated.dat',status='unknown',form='formatted')
   do k=1,factor*Nt     
      write(27,*) t_interp(k),y_interp(k)/Nt
   end do
